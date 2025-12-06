@@ -18,16 +18,21 @@ def main():
 
     client =  genai.Client(api_key=api_key)
     messages = [types.Content(role="user", parts=[types.Part(text=args.user_prompt)])]
-    
+
+    if args.verbose:
+        print(f"User prompt: {args.user_prompt}")
+
+    generate_content(client, messages, args.verbose)
+
+def generate_content(client, messages, verbose):
     response = client.models.generate_content(
         model='gemini-2.5-flash',
         contents=messages,
     )
     if not response.usage_metadata:
-        raise RuntimeError("Failed API request, no usage metadata produced")
+        raise RuntimeError("Failed API response, no usage metadata produced")
 
-    if args.verbose:
-        print(f"User prompt: {args.user_prompt}")
+    if verbose:
         print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
         print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
     print("Response:")
